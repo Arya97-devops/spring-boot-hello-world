@@ -41,3 +41,36 @@ jobs:
       - name: Push Docker Image
         run: |
           docker push asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/springboot-repo/spring-boot-hello-world:${{ github.sha }}
+
+      - name: Get GKE Credentials
+        run: |
+          gcloud container clusters get-credentials \
+          ${{ secrets.GKE_CLUSTER }} \
+          --zone ${{ secrets.GKE_ZONE }} \
+          --project ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Deploy to GKE
+        run: |
+          kubectl apply -f cluster_deploy/deployment.yaml
+          kubectl apply -f cluster_deploy/service.yaml
+
+      - name: Update Deployment Image
+        run: |
+          kubectl set image deployment/springboot-app \
+          springboot-app=asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/springboot-repo/spring-boot-hello-world:${{ github.sha }}
+
+      - name: Verify Rollout
+        run: |
+          kubectl rollout status deployment/springboot-app
+
+      - name: Verify Deployment
+        run: |
+          kubectl get deployments
+
+      - name: Verify Pods
+        run: |
+          kubectl get pods
+
+      - name: Verify Services
+        run: |
+          kubectl get services
