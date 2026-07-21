@@ -51,8 +51,8 @@ jobs:
 
       - name: Deploy to GKE
         run: |
-          kubectl apply -f cluster_deploy/deployment.yaml
-          kubectl apply -f cluster_deploy/service.yaml
+          kubectl apply -f k8s/deployment.yaml
+          kubectl apply -f k8s/service.yaml
 
       - name: Update Deployment Image
         run: |
