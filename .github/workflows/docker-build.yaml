@@ -73,9 +73,15 @@ jobs:
         run: |
           kubectl describe deployment springboot-app
 
-      - name: Describe Pods
+      - name: Get Events
         run: |
-          kubectl describe pods -l app=springboot-app
+          kubectl get events --sort-by=.metadata.creationTimestamp
+
+      - name: Describe Pods
+          run: |
+            kubectl get pods
+            POD_NAME=$(kubectl get pods -l app=springboot-app -o jsonpath="{.items[0].metadata.name}")
+            kubectl describe pod $POD_NAME
 
       - name: Show Pod Logs
         continue-on-error: true
