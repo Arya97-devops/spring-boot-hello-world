@@ -61,17 +61,30 @@ jobs:
           kubectl set image deployment/springboot-app \
           springboot-app=asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/springboot-repo/spring-boot-hello-world:${{ github.sha }}
 
-      - name: Verify Rollout
-        run: |
-          kubectl rollout status deployment/springboot-app
-
-      - name: Verify Deployment
+      - name: Check Deployments
         run: |
           kubectl get deployments
 
-      - name: Verify Pods
+      - name: Check Pods
         run: |
-          kubectl get pods
+          kubectl get pods -o wide
+
+      - name: Describe Deployment
+        run: |
+          kubectl describe deployment springboot-app
+
+      - name: Describe Pods
+        run: |
+          kubectl describe pods -l app=springboot-app
+
+      - name: Show Pod Logs
+        continue-on-error: true
+        run: |
+          kubectl logs -l app=springboot-app --all-containers=true
+
+      - name: Verify Rollout
+        run: |
+          kubectl rollout status deployment/springboot-app
 
       - name: Verify Services
         run: |
