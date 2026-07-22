@@ -61,6 +61,10 @@ jobs:
           kubectl set image deployment/springboot-app \
           springboot-app=asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/springboot-repo/spring-boot-hello-world:${{ github.sha }}
 
+      - name: Verify Rollout
+        run: |
+          kubectl rollout status deployment/springboot-app --timeout=180s
+
       - name: Check Deployment
         run: |
           kubectl get deployments
@@ -73,25 +77,22 @@ jobs:
         run: |
           kubectl describe deployment springboot-app
 
+      - name: Describe Pods
+        if: always()
+        continue-on-error: true
+        run: |
+          kubectl describe pods
+
+      - name: Show Logs
+        if: always()
+        continue-on-error: true
+        run: |
+          kubectl logs -l app=springboot-app --tail=100
+      
       - name: Get Events
         run: |
           kubectl get events --sort-by=.metadata.creationTimestamp
-
-      - name: Describe Pods
-        run: |
-          kubectl get pods
-          POD_NAME=$(kubectl get pods -l app=springboot-app -o jsonpath="{.items[0].metadata.name}")
-          kubectl describe pod $POD_NAME
-
-      - name: Show Pod Logs
-        continue-on-error: true
-        run: |
-          kubectl logs -l app=springboot-app --all-containers=true
-
-      - name: Verify Rollout
-        run: |
-          kubectl rollout status deployment/springboot-app
-
+      
       - name: Verify Services
         run: |
           kubectl get services
