@@ -61,7 +61,7 @@ jobs:
           kubectl set image deployment/springboot-app \
           springboot-app=asia-south1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/springboot-repo/spring-boot-hello-world:${{ github.sha }}
 
-      - name: Check Deployments
+      - name: Check Deployment
         run: |
           kubectl get deployments
 
